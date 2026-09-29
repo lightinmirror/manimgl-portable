@@ -1,0 +1,48 @@
+# ---- 绝不入库的大件（走 Release 附件，浏览器上传） ----
+*.zip
+*.7z
+*.tar
+*.tar.gz
+manim-env/
+python/
+tectonic-cache.tar*
+
+# ---- 二进制散件 ----
+*.exe
+*.dll
+*.pyd
+*.pdb
+*.lib
+*.a
+*.o
+*.so
+*.dylib
+
+# ---- 备份 ----
+*.bak
+*.prepatch.bak
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# ---- 运行产物 ----
+videos/
+media/
+frames/
+frames2/
+frames3/
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+*.swp
+
+# ---- Rust 构建产物 ----
+launcher/target/
+*.pdb

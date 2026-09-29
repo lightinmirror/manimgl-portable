@@ -1,0 +1,19 @@
+[package]
+name = "manimgl-portable"
+version = "1.0.0"
+edition = "2021"
+description = "Self-extracting launcher for the manimgl-portable bundle"
+
+[[bin]]
+name = "manimgl-portable"
+path = "src/main.rs"
+
+[dependencies]
+zip = "8"
+
+[profile.release]
+opt-level = "z"
+lto = true
+strip = true
+codegen-units = 1
+panic = "abort"

@@ -1,0 +1,19 @@
+--- a/manimlib/tex_templates.yml
++++ b/manimlib/tex_templates.yml
+@@ -70,6 +70,16 @@
+     \usepackage{amssymb}
+     \usepackage{xcolor}
+ 
++basic_ctex_tealc:
++  description: ""
++  compiler: tectonic
++  preamble: |-
++    \usepackage[UTF8]{ctex}
++    \usepackage{amsmath}
++    \usepackage{amssymb}
++    \usepackage{xcolor}
++    \setCJKmainfont[Extension=.otf,BoldFont={FandolSong-Bold}]{FandolSong-Bold}
++
+ empty:
+   description: ""
+   compiler: latex

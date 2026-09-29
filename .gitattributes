@@ -1,0 +1,18 @@
+# 默认：文本文件按内容自动判定，行尾统一成 LF（跨平台友好）
+* text=auto eol=lf
+
+# Windows 批处理 / PowerShell 脚本必须是 CRLF，否则可能不被正确执行
+*.cmd           text eol=crlf
+*.bat           text eol=crlf
+*.ps1           text eol=crlf
+
+# 二进制：禁止 git 做行尾转换
+*.png           binary
+*.jpg           binary
+*.zip           binary
+*.exe           binary
+*.dll           binary
+*.pyd           binary
+*.ttf           binary
+*.otf           binary
+*.pfb           binary

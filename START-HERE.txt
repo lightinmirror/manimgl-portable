@@ -1,0 +1,48 @@
+manimgl-portable
+=================
+
+第一次使用
+----------
+
+1. 双击 setup.cmd
+   它会解除 Windows 的“来自网络”标记，检查包内的 tectonic、dvisvgm、ffmpeg
+   和解释器，并修正虚拟环境的路径。第一次大约需要 10～60 秒。
+
+   看到 “manimlib import OK” 和 “完成” 后，按任意键关闭窗口。
+
+2. 双击 run-demo.cmd
+   它会渲染 demo.py。成功后打开 videos 文件夹，里面应该有 Demo.mp4。
+
+3. 想看完整示例时，双击 run-showcase.cmd。
+   这个脚本不会代替 setup.cmd 做自检，所以第一次使用前先完成第 1 步。
+
+自己写场景
+----------
+
+在包目录里新建 my.py：
+
+    from manimlib import *
+
+    class MyScene(Scene):
+        def construct(self):
+            self.play(FadeIn(Text("你好")))
+
+在这个目录的地址栏输入 powershell，然后运行：
+
+    manim-env\Scripts\python.exe -m manimlib my.py MyScene -w -m
+
+结果在 videos\MyScene.mp4。
+
+常见情况
+--------
+
+* 包里已经有 Python、LaTeX 相关工具和 ffmpeg，不需要另装。
+* ffmpeg.exe 和 tectonic.exe 可能被杀毒软件误报。解压前把包目录加入白名单，
+  或在隔离区恢复这两个文件。
+* 中文显示成方框，通常是系统没有 Microsoft YaHei。
+* 把整个文件夹搬到别处后，要在新位置再双击 setup.cmd。否则虚拟环境还会指向旧路径。
+* 路径过长时，setup.cmd 会把包搬到一个更短的位置。
+* 第一次渲染公式会慢一些，因为要准备 TeX 资源；之后会快很多。
+* 需要逐项检查时，双击 check.cmd，并把窗口截图发回来。
+
+技术说明见 RESTORE.md，第三方组件和许可证见 THIRD-PARTY.md。

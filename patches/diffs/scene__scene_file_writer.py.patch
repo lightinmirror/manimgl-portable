@@ -1,0 +1,59 @@
+--- a/manimlib/scene/scene_file_writer.py
++++ b/manimlib/scene/scene_file_writer.py
+@@ -23,6 +23,47 @@
+ 
+     from manimlib.camera.camera import Camera
+     from manimlib.scene.scene import Scene
++
++
++def _resolve_ffmpeg_bin(ffmpeg_bin: str) -> str:
++    """Resolve ffmpeg, preferring a copy vendored next to the interpreter.
++
++    A venv-local ffmpeg (``Scripts/ffmpeg.exe``) keeps this environment
++    relocatable: the config can simply say ``"ffmpeg"`` instead of hardcoding
++    an absolute path.
++
++    An explicitly configured path is honoured only if it really exists.  A stale
++    absolute path (e.g. one left over from the machine this bundle was built on)
++    would otherwise blow up much later, deep inside subprocess.Popen, with a
++    bare "FileNotFoundError: [WinError 2]".
++    """
++    name = Path(ffmpeg_bin).name or "ffmpeg.exe"
++    if platform.system() == "Windows" and not name.lower().endswith(".exe"):
++        name += ".exe"
++    bundled = Path(sys.executable).parent / name
++
++    has_dir = bool(os.path.dirname(ffmpeg_bin))
++    if has_dir and os.path.exists(ffmpeg_bin):
++        return ffmpeg_bin
++
++    if bundled.exists():
++        if has_dir:
++            log.warning(
++                f"configured ffmpeg {ffmpeg_bin!r} does not exist; using the "
++                f"bundled copy instead. Absolute paths in custom_config.yml do "
++                f"not survive moving the environment to another machine."
++            )
++        return str(bundled)
++
++    found = shutil.which("ffmpeg") or shutil.which(name)
++    if found:
++        return found
++
++    log.warning(
++        f"ffmpeg not found next to {sys.executable} or on PATH; falling back "
++        f"to {ffmpeg_bin!r}. Video rendering will fail until it is available."
++    )
++    return ffmpeg_bin
+ 
+ 
+ class SceneFileWriter(object):
+@@ -62,7 +103,7 @@
+         self.quiet = quiet
+         self.total_frames = total_frames
+         self.progress_description_len = progress_description_len
+-        self.ffmpeg_bin = ffmpeg_bin
++        self.ffmpeg_bin = _resolve_ffmpeg_bin(ffmpeg_bin)
+         self.video_codec = video_codec
+         self.pixel_format = pixel_format
+         self.saturation = saturation

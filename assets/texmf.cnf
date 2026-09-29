@@ -1,0 +1,31 @@
+% Minimal kpathsea configuration vendored for manimgl's LaTeX -> SVG step.
+%
+% Only the search paths dvisvgm needs in order to locate font files are
+% defined here.  TEXMF itself is normally supplied by the environment:
+% manimlib/utils/tex_file_writing.py sets TEXMF and TEXMFCNF for the
+% subprocess, which overrides anything below.
+%
+% For standalone use, TEXMFROOT is derived from the location of dvisvgm.exe
+% via kpathsea's $SELFAUTODIR, so this file contains NO absolute paths and the
+% whole tree stays relocatable.
+
+TEXMFROOT = $SELFAUTOLOC/texmf
+TEXMF = $TEXMFROOT
+TEXMFDIST = $TEXMF
+TEXMFLOCAL = $TEXMF
+TEXMFHOME = $TEXMF
+TEXMFVAR = $TEXMF
+TEXMFCONFIG = $TEXMF
+TEXMFSYSVAR = $TEXMF
+TEXMFSYSCONFIG = $TEXMF
+
+T1FONTS = $TEXMF/fonts/type1//
+TFMFONTS = $TEXMF/fonts/tfm//
+OPENTYPEFONTS = $TEXMF/fonts/opentype//
+TTFONTS = $TEXMF/fonts/truetype//
+VFFONTS = $TEXMF/fonts/vf//
+ENCFONTS = $TEXMF/fonts/enc//
+CMAPFONTS = $TEXMF/fonts/cmap//
+FONTMAP = $TEXMF/fonts/map//
+TEXCONFIG = $TEXMF/fonts/map//
+TEXINPUTS = .;$TEXMF/tex//

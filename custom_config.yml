@@ -1,0 +1,28 @@
+# Project-level ManimGL overrides (optional).
+#
+# NOTE: the package defaults already live INSIDE the venv at
+#     manim-env\Lib\site-packages\manimlib\default_config.yml
+# and they cover:
+#     tex.template           = "basic_ctex_tealc"   (tectonic, no system TeX needed)
+#     text.font              = "Microsoft YaHei"    (CJK coverage)
+#     file_writer.ffmpeg_bin = "ffmpeg"             (resolves to Scripts\ffmpeg.exe)
+#
+# Those are package defaults, so they apply no matter which directory you
+# render from.  THIS file, by contrast, is only loaded from the current
+# working directory (that is how manimgl works).
+#
+# Use this file only for machine- or project-specific overrides, and:
+#     *** DO NOT PUT ABSOLUTE PATHS IN IT ***
+# A path such as D:\xxx only exists on the machine that wrote it; after moving
+# the folder it fails much later, as a bare "FileNotFoundError: [WinError 2]".
+#
+# Examples (uncomment to use):
+#
+#   text:
+#     font: "SimSun"           # use a different Chinese font
+#
+#   file_writer:
+#     ffmpeg_bin: "ffmpeg"     # keep it a bare name; it resolves inside the venv
+#
+# Keep this file ASCII-only: manimgl reads YAML with the system locale encoding
+# (cp936 on Chinese Windows), so non-ASCII text here can fail to parse.

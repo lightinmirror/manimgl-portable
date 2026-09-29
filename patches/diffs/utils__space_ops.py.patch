@@ -1,0 +1,13 @@
+--- a/manimlib/utils/space_ops.py
++++ b/manimlib/utils/space_ops.py
+@@ -499,6 +499,9 @@
+             used[j] = True
+             v += rings[j]
+             ring_ends.append(len(v))
+-        res += [v[i] for i in earcut(verts[v, :2], ring_ends)]
++        # mapbox_earcut >= 2.0 requires an ndarray (older versions accepted a
++        # plain list); passing a list raises TypeError, which leaves the
++        # glyph's interior untriangulated and renders some characters wrong.
++        res += [v[i] for i in earcut(verts[v, :2], np.asarray(ring_ends, dtype='uint32'))]
+ 
+     return res

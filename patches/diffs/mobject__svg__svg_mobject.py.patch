@@ -1,0 +1,13 @@
+--- a/manimlib/mobject/svg/svg_mobject.py
++++ b/manimlib/mobject/svg/svg_mobject.py
+@@ -138,7 +138,9 @@
+         return self.mobjects_from_svg(svg)
+ 
+     def file_name_to_svg_string(self, file_name: str) -> str:
+-        return Path(get_full_vector_image_path(file_name)).read_text()
++        # explicit UTF-8: the locale encoding (cp936 on Chinese Windows) would
++        # mangle or reject non-ASCII SVG content
++        return Path(get_full_vector_image_path(file_name)).read_text(encoding="utf-8")
+ 
+     def modify_xml_tree(self, element_tree: ET.ElementTree) -> ET.ElementTree:
+         config_style_attrs = self.generate_config_style_dict()

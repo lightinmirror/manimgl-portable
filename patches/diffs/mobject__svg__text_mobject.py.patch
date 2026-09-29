@@ -1,0 +1,11 @@
+--- a/manimlib/mobject/svg/text_mobject.py
++++ b/manimlib/mobject/svg/text_mobject.py
+@@ -95,7 +95,7 @@
+         alignment=alignment,
+         pango_width=pango_width
+     )
+-    result = temp_file.read_text()
++    result = temp_file.read_text(encoding="utf-8")
+     os.remove(temp_file)
+     return result
+ 

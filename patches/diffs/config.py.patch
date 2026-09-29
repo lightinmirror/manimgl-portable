@@ -1,0 +1,22 @@
+--- a/manimlib/config.py
++++ b/manimlib/config.py
+@@ -334,8 +334,17 @@
+ 
+ def load_yaml(file_path: str):
+     try:
+-        with open(file_path, "r") as file:
+-            return yaml.safe_load(file) or {}
++        # Config files are authored as UTF-8, but open() defaults to the locale
++        # encoding -- cp936/GBK on a Chinese Windows -- which makes any config
++        # containing non-ASCII text die with UnicodeDecodeError.  Try UTF-8
++        # first (utf-8-sig also swallows a BOM), then fall back to the locale
++        # encoding for legacy files.
++        try:
++            with open(file_path, "r", encoding="utf-8-sig") as file:
++                return yaml.safe_load(file) or {}
++        except UnicodeDecodeError:
++            with open(file_path, "r") as file:
++                return yaml.safe_load(file) or {}
+     except FileNotFoundError:
+         return {}
+ 

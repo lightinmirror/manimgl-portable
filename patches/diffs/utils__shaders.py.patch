@@ -1,0 +1,11 @@
+--- a/manimlib/utils/shaders.py
++++ b/manimlib/utils/shaders.py
+@@ -90,7 +90,7 @@
+     except IOError:
+         return None
+ 
+-    with open(filepath, "r") as f:
++    with open(filepath, "r", encoding="utf-8") as f:
+         result = f.read()
+ 
+     # To share functionality between shaders, some functions are read in

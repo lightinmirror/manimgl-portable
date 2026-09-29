@@ -1,0 +1,26 @@
+--- a/manimlib/default_config.yml
++++ b/manimlib/default_config.yml
+@@ -53,6 +53,8 @@
+   background_opacity: 1.0
+ file_writer:
+   # What command to use for ffmpeg
++  # A bare name resolves to a vendored Scripts/ffmpeg.exe first, then PATH,
++  # so no absolute path is needed to stay relocatable.
+   ffmpeg_bin: "ffmpeg"
+   # Parameters to pass into ffmpeg
+   video_codec: "libx264"
+@@ -73,9 +75,12 @@
+   default_stroke_width: 4.0
+ tex:
+   # See tex_templates.yml
+-  template: "default"
++  # Vendored default: tectonic-based template so no system TeX install is needed.
++  template: "basic_ctex_tealc"
+ text:
+-  font: "Consolas"
++  # Vendored default: Consolas has no CJK coverage on this setup, which makes
++  # Chinese fall back to missing-glyph boxes. YaHei ships with Windows.
++  font: "Microsoft YaHei"
+   alignment: "LEFT"
+ embed:
+   exception_mode: "Verbose"

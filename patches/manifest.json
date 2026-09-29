@@ -1,0 +1,77 @@
+{
+  "upstream": "manimgl 1.7.2 (PyPI wheel sha256 e2644c93cffd93ea56ddded9c9752b9371f7d2d19e99da5693dd03b2e0d658e4)",
+  "files": [
+    {
+      "path": "manimlib/config.py",
+      "pre_sha256": "40c2c38a8fd5f154927c6c32b0819f443a2d34252bf87e33a240043346c3f62c",
+      "post_sha256": "a3d26e25da4d56991e9bd0a69e95da58b4601cda58d4613ecd5e92f28c7b129c",
+      "diff": "diffs/config.py.patch",
+      "added_lines": 11,
+      "removed_lines": 2
+    },
+    {
+      "path": "manimlib/default_config.yml",
+      "pre_sha256": "0c623206125d0607fcc1574cf60ef215b225d521465b6315ad71de3593542103",
+      "post_sha256": "6d56f18233993b537a763cadcb842084cd75d13d5d248177e2f3ab6b4cde4a75",
+      "diff": "diffs/default_config.yml.patch",
+      "added_lines": 7,
+      "removed_lines": 2
+    },
+    {
+      "path": "manimlib/mobject/svg/svg_mobject.py",
+      "pre_sha256": "533992ef7a828560ea6eb1db79c688b2f62d6fdbf49b2675601ce5619c39d88c",
+      "post_sha256": "c4798ad1e1cf469cd7ec935b26988aca4cd2df2ae1e528e77e5f251356c7a10d",
+      "diff": "diffs/mobject__svg__svg_mobject.py.patch",
+      "added_lines": 3,
+      "removed_lines": 1
+    },
+    {
+      "path": "manimlib/mobject/svg/text_mobject.py",
+      "pre_sha256": "5babde97dcefb77e6c54152a278408e1b50d7872712d200fb8ce604d390bf5df",
+      "post_sha256": "9f6afa185f5541735a42df81b67c259be33dbcf8285b942798bb27d8822506c4",
+      "diff": "diffs/mobject__svg__text_mobject.py.patch",
+      "added_lines": 1,
+      "removed_lines": 1
+    },
+    {
+      "path": "manimlib/scene/scene_file_writer.py",
+      "pre_sha256": "8ca21c9df183f3d78c87b40982176a2cabab298addf3287bd0e32d525368c1c9",
+      "post_sha256": "39bea11e162b999dee19423fbf18593b73aa523ae4f5aa06a4a16a54cd51be53",
+      "diff": "diffs/scene__scene_file_writer.py.patch",
+      "added_lines": 42,
+      "removed_lines": 1
+    },
+    {
+      "path": "manimlib/tex_templates.yml",
+      "pre_sha256": "659fee61d9971006e2d4a16c9a3165e201c77acb5fb79c3bdaf7bf40e4e81ca5",
+      "post_sha256": "235c0d1f8bb53ed8c5f85f084fc5f40936c5cce058760c71998d55abc76e8a66",
+      "diff": "diffs/tex_templates.yml.patch",
+      "added_lines": 10,
+      "removed_lines": 0
+    },
+    {
+      "path": "manimlib/utils/shaders.py",
+      "pre_sha256": "7179ef7519c497220ceaec5d238299a8fc5126fcef98eeab9e2f5222d3260299",
+      "post_sha256": "55efb8150e5b8e16c386c5285e8cc184335d7a6a19605b6b31d713111a14fcdb",
+      "diff": "diffs/utils__shaders.py.patch",
+      "added_lines": 1,
+      "removed_lines": 1
+    },
+    {
+      "path": "manimlib/utils/space_ops.py",
+      "pre_sha256": "724787ac2ceeeb0b394a4c51c5910645c19467381136c9a2700e45158732de8c",
+      "post_sha256": "424b5b940a01a2b6428b756a0f07eefb9d5e7119518fb3f67befa5256904c282",
+      "diff": "diffs/utils__space_ops.py.patch",
+      "added_lines": 4,
+      "removed_lines": 1
+    },
+    {
+      "path": "manimlib/utils/tex_file_writing.py",
+      "pre_sha256": "6a2fd9568419d1754b09876e74c556c4c40b4515635eb87fcaee7b8c33448d33",
+      "post_sha256": "df5ecdd83c5385643743f488e15748f968eda8f16797ae6ca977efecd1da526b",
+      "diff": "diffs/utils__tex_file_writing.py.patch",
+      "added_lines": 117,
+      "removed_lines": 21
+    }
+  ]
+}
