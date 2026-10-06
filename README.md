@@ -6,7 +6,7 @@ manimgl 是 3Blue1Brown 用的动画引擎。在 Windows 上直接装它比较�
 科学计算库，要装 TeX 发行版才有公式，要装 FFmpeg 还要配 PATH，中文在 GBK 环境下还会碰上
 一串编码问题。
 
-这个包把这些东西预先装好、调好，压成 232 MB。目标机什么都不用装，解压后双击两下就能出
+这个包把这些东西预先装好、调好，压成 233.5 MB。目标机什么都不用装，解压后双击两下就能出
 视频，并且可以离线跑。
 
 ![demo](demo.gif)
@@ -25,21 +25,22 @@ manimgl 是 3Blue1Brown 用的动画引擎。在 Windows 上直接装它比较�
 
 ### 单文件 exe
 
-1. 从 [Releases](../../releases/latest) 下载 `manimgl-portable.exe`（233 MB）
+1. 从 [Releases](../../releases/latest) 下载 `manimgl-portable.exe`（234.2 MB）
 2. 双击
 
 首次运行会解包到 `%LOCALAPPDATA%\manimgl-portable\<版本>\` 并自检，大约一分钟；然后跑一个
 演示，成功后会打开 `videos` 文件夹，里面是 `Demo.mp4`。以后再运行只要几秒，不会重复解包。
 
-命令行参数原样转给 manimgl：
+命令行参数原样转给 manimgl。要在 exe 所在目录里运行 —— PowerShell 不会执行当前目录下的
+程序，所以前面要带 `.\`：
 
 ```powershell
-manimgl-portable.exe my_scene.py MyScene -w -l
+.\manimgl-portable.exe my_scene.py MyScene -w -l
 ```
 
 ### zip
 
-1. 下载 `manimgl-selfcontained-win64.zip`（232 MB）
+1. 下载 `manimgl-selfcontained-win64.zip`（233.5 MB）
 2. 解压（位置随意；路径过长时脚本会自己搬到短位置）
 3. 双击 `setup.cmd`，再双击 `run-demo.cmd`
 
@@ -55,7 +56,7 @@ manimgl-portable.exe my_scene.py MyScene -w -l
 `tectonic.exe`（49 MB）是误报高发对象，经常被直接隔离删除。出问题就双击 `check.cmd`，
 它会逐项报出哪个组件异常，把整屏截图发到 Issues 即可。
 
-目标机如果已经装了 Python 3.12，可以改用 `manimgl-env-portable.zip`（214 MB），省掉自带的
+目标机如果已经装了 Python 3.12，可以改用 `manimgl-env-portable.zip`（215.8 MB），省掉自带的
 那套解释器。
 
 ## 自己写场景
@@ -83,11 +84,11 @@ manim-env\Scripts\python.exe -m manimlib my.py MyScene -w -m
 | 自己装 manimgl | 本包 |
 |---|---|
 | Python 加 numpy、scipy、matplotlib、moderngl 等一堆依赖 | CPython 与全部依赖已打包 |
-| TeX 发行版才有公式。本机装的 TeX Live 2024 是 8.33 GB、23.9 万个文件；MiKTeX 轻得多，但要能跑起来也在一 GB 上下 | 内置 Tectonic 加最小字体树，55 MB |
+| TeX 发行版才有公式。本机装的 TeX Live 2024 是 8.33 GB、23.9 万个文件；MiKTeX 轻得多，但要能跑起来也在一 GB 上下 | 内置 Tectonic、dvisvgm 与最小字体树，解压后约 104 MB |
 | FFmpeg，还要配好 PATH | 内置静态 FFmpeg |
 | 中文豆腐块、GBK 编码报错 | 已处理 |
 
-代价是包体 232 MB（压缩后）。
+代价是包体 233.5 MB（压缩后）。
 
 ## 包里有什么
 
@@ -105,6 +106,8 @@ START-HERE.txt / RESTORE.md
 THIRD-PARTY.md / LICENSES\
 ```
 
+上面这份是 zip 的内容。`patches/`、`LICENSE`、构建脚本只在源码仓库里，不进发行包。
+
 ## 已知问题
 
 - 只在 Windows x64 上验证过。包内是 `.exe`，Linux 和 macOS 用不了。
@@ -112,14 +115,16 @@ THIRD-PARTY.md / LICENSES\
   缺字体，这时会明确报错，不会静默画错。
 - 中文依赖目标机有微软雅黑，中文版 Windows 自带。
 - `Tex` 里的中文用包内自带的 FandolSong-Bold。Fandol 的 Regular 笔画偏细，`式` 这类字会
-  明显发虚，所以钉成了 Bold。要换字体就改 `manimlib/tex_templates.yml` 里
-  `basic_ctex_tealc` 的 `\setCJKmainfont`。
+  明显发虚，所以钉成了 Bold。要换字体就改
+  `manim-env\Lib\site-packages\manimlib\tex_templates.yml` 里 `basic_ctex_tealc` 的
+  `\setCJKmainfont`。
 - 首次渲染公式需要 TeX 资源。包里带了缓存，所以能离线；缓存丢了 tectonic 会联网下载约
   90 MB。
-- **把文件夹搬到别处之后，要在新位置再双击一次 `setup.cmd`。** 包内只有一处绝对路径
-  （`pyvenv.cfg` 的 `home`，venv 机制要求绝对路径），移动后它仍指向旧位置，直接启动会报
-  `No Python at '"<旧路径>\python\python.exe'`，重跑 `setup.cmd` 会自动改写。路径过长时
-  `bootstrap.ps1` 会把整个目录搬到 `%LOCALAPPDATA%\manimgl-portable`。
+- **把文件夹搬到别处之后，要在新位置再双击一次 `setup.cmd`。** 移动后需要修复的只有解释器
+  路径 —— `pyvenv.cfg` 的 `home`（venv 机制要求绝对路径）。它仍指向旧位置，直接启动会报
+  `No Python at '"<旧路径>\python\python.exe'`，重跑 `setup.cmd` 会自动改写。包内另有几处
+  构建期元数据（如 pip 的 `direct_url.json`）带绝对来源地址，但运行时不会被读取。
+  路径过长时 `bootstrap.ps1` 会把整个目录搬到 `%LOCALAPPDATA%\manimgl-portable`。
 - `setup.cmd` 的自检、以及跑 demo 时会打印一条 pydub 找不到 ffmpeg 的警告。那是 pydub
   自己在 PATH 上找 ffmpeg 造成的，不影响渲染，manimgl 走的是包内那个 ffmpeg。
 
@@ -145,7 +150,8 @@ Text("hello", color=YELLOW)        # 无效
 里的；把文本读写显式指定 UTF-8，免得 GBK 环境下中文被写坏；给 `mapbox_earcut >= 2.0`、
 `setuptools >= 82` 这类依赖变动兜底。
 
-完整清单带 pre/post sha256 校验，在 [`patches/README.md`](patches/README.md)。
+完整清单带 pre/post sha256 校验，在源码仓库的 [`patches/README.md`](patches/README.md) 里
+（`patches/` 不进发行包）。
 
 ## 从源码构建
 
@@ -171,11 +177,11 @@ powershell -ExecutionPolicy Bypass -File make-release.ps1 -TexAssetsZip <...\tex
 powershell -ExecutionPolicy Bypass -File apply-patches.ps1 -VenvDir <你的 venv>
 ```
 
-只重新打包：
+只重新打包。`-VenvDir` 是必需的，不传会在前置检查直接失败；其余参数留空会按默认推断：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File build.ps1
-#   -VenvDir <已打好补丁的 venv>   -PkgDir <包根>   -OutDir <产物目录>
+powershell -ExecutionPolicy Bypass -File build.ps1 -VenvDir <已打好补丁的 venv>
+#   可选：-PkgDir <包根>   -OutDir <产物目录>   -BuildPath <构建机路径前缀>
 ```
 
 `build.ps1` 的流程是前置检查、打包、审计、写 MANIFEST。审计不过就非零退出，产物不可发布。
@@ -189,7 +195,8 @@ powershell -ExecutionPolicy Bypass -File build.ps1
 
 本包聚合了多个独立程序，各自适用自己的许可，其中 dvisvgm 与 FFmpeg 是 GPLv3，字体 Fandol
 是 GPL。清单、许可文本和上游源码地址见 [THIRD-PARTY.md](THIRD-PARTY.md) 和
-[`LICENSES/`](LICENSES/)。本仓库自己的脚本与补丁见 [LICENSE](LICENSE)。
+[`LICENSES/`](LICENSES/) —— 这两份都在发行包里。本仓库自己的脚本与补丁见
+[LICENSE](LICENSE)，它只在源码仓库里。
 
 感谢 [3Blue1Brown / manim](https://github.com/3b1b/manim)、
 [Tectonic](https://github.com/tectonic-typesetting/tectonic)、

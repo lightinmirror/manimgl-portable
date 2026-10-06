@@ -16,10 +16,14 @@ manim-env\Scripts\python.exe -m manimlib demo.py Demo -w -m
 ```
 
 成功标志是 `D:\mgl\videos\Demo.mp4` 出现。TeX 缓存已经折进主包；如果缓存没有安装，
-首次公式渲染会联网下载约 90 MB。也可以单独安装：
+首次公式渲染会联网下载约 90 MB。也可以手动装一次 —— 把 Release 里的 `tectonic-cache.zip`
+解压到 `%LOCALAPPDATA%`（压缩包里就是 `TectonicProject\` 这一层，直接解到该目录即可）：
 
 ```powershell
+tar -xf <压缩包所在>\tectonic-cache.zip -C "$env:LOCALAPPDATA"
 ```
+
+装好后 `%LOCALAPPDATA%\TectonicProject\Tectonic\cache\bundles` 应该存在。
 
 ## 移动目录
 
@@ -49,7 +53,8 @@ No Python at '"<旧路径>\python\python.exe'
 包内最长的相对路径约 146 个字符，bootstrap 使用约 94 个字符作为安全上限。超过上限时，
 它会把目录复制到 `%LOCALAPPDATA%\manimgl-portable` 后继续运行。
 
-tectonic、dvisvgm 和 ffmpeg 都按 `sys.executable` 的位置查找，不依赖系统 PATH：
+tectonic、dvisvgm 和 ffmpeg 优先按 `sys.executable` 的位置查找，包内工具完整时不依赖系统
+PATH；包内的丢了才会回落到 PATH 里的同名程序（见文末「注意事项」）：
 
 | 工具 | 查找代码 |
 |---|---|
@@ -57,9 +62,10 @@ tectonic、dvisvgm 和 ffmpeg 都按 `sys.executable` 的位置查找，不依�
 | dvisvgm | `tex_file_writing._find_dvisvgm()` |
 | ffmpeg | `scene_file_writer._resolve_ffmpeg_bin()` |
 
-`default_config.yml` 在包内，默认设置也在包内：
+`default_config.yml` 在包内，默认设置也在包内。下面只是把用到的三个值列出来示意，
+不是可复制的 YAML：
 
-```yaml
+```text
 tex.template            = "basic_ctex_tealc"
 text.font               = "Microsoft YaHei"
 file_writer.ffmpeg_bin  = "ffmpeg"
@@ -91,7 +97,7 @@ file_writer.ffmpeg_bin  = "ffmpeg"
 | `manim-env\Scripts\dvisvgm.exe` | DVI/XDV 到 SVG 的静态工具 | 6.3 MB |
 | `manim-env\Scripts\texmf\` | 最小字体树和 `texmf.cnf` | 49.2 MB |
 | `manim-env\Scripts\ffmpeg.exe` | 静态视频编码器 | 77.1 MB |
-| `python\` | CPython 3.12.10 | 61.9 MB |
+| `python\` | CPython 3.12.10 | 49.0 MB |
 | `bootstrap.ps1` | 安装和自检 | — |
 | `demo.py` | 冒烟测试场景 | — |
 
@@ -101,7 +107,7 @@ file_writer.ffmpeg_bin  = "ffmpeg"
 `apply-patches.ps1` 只接受这两个状态：已经打过就跳过，正好是上游原版就覆盖，其他情况中止。
 这样不会把补丁悄悄打进一个未知版本的 manimgl。
 
-详细文件清单和 diff 在 `patches/README.md`。
+详细文件清单和 diff 在 `patches/README.md` 里；注意 `patches/` 只在源码仓库里，不进发行包。
 
 ## 注意事项
 
@@ -111,7 +117,10 @@ file_writer.ffmpeg_bin  = "ffmpeg"
 * `pydub` 可能提示在 PATH 中找不到 ffmpeg。这条提示不影响当前渲染路径，manimgl 会使用包内
   的 ffmpeg。
 
-## 恢复到上游文件
+## 重建补丁环境
 
 补丁前的哈希、补丁后的哈希和完整的补丁文件都在 `patches/`。不建议手动删除单个改动；
-要恢复时重新安装 `manimgl==1.7.2`，再按 `apply-patches.ps1` 的流程打补丁。
+要重新得到这个补丁环境，先装上游 `manimgl==1.7.2`，再按 `apply-patches.ps1` 的流程打一遍。
+
+想回到**未打补丁**的上游文件，重装 `manimgl==1.7.2` 之后就停手，不要再跑
+`apply-patches.ps1` —— 那个脚本会直接覆盖成补丁版本。

@@ -25,9 +25,8 @@
 
 ```text
 1. 解压到短路径，例如 D:\mgl
-2. 双击 setup.cmd，确认自检完成
+2. 双击 setup.cmd，确认自检完成（这一步会装 TeX 缓存）
 3. 双击 run-demo.cmd，确认 videos\Demo.mp4 出现
-4. 断网再跑一次，确认缓存确实能离线工作
 ```
 
 要看画面，不只看命令有没有退出：
@@ -35,9 +34,17 @@
 * 标题和 `中文公式` 没有方框或乱码
 * `a/b` 的分数线、求和、积分都在
 * 卡片四边和四个圆角完整
-* 断网时仍能完成首次公式渲染
 
 出问题时运行 `check.cmd`，把窗口截图和错误一起发回来。
+
+## 离线首跑要单独验
+
+不能靠「先联网跑一遍、再断网跑一遍」来证明首跑离线 —— 第一次联网跑的时候缓存就已经装好了，
+后面那次断网跑只证明了「缓存已存在时能离线」，不是「首跑不需要网络」。
+
+要证明首跑离线，得在**首次公式编译之前**就断网，或者用没有缓存的机器。本次是另行验证的：
+把 Release 里的 `tectonic-cache.zip` 解到 `%LOCALAPPDATA%`，再用 `--only-cached` 强制只读
+本地资源编译同一份 `.tex`。空缓存时同一条命令会失败，所以通过是有意义的。
 
 ## 这次构建前检查过的坑
 
@@ -53,9 +60,11 @@
 每次改动 `manimlib` 或包根文件后，重新运行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File build.ps1
+powershell -ExecutionPolicy Bypass -File build.ps1 -VenvDir <已打好补丁的 venv>
 powershell -ExecutionPolicy Bypass -File build-exe.ps1
 ```
+
+`build.ps1` 的 `-VenvDir` 是必需的，不传会在前置检查直接失败。
 
 发布前检查：
 
