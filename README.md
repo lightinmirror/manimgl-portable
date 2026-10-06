@@ -1,67 +1,85 @@
 # manimgl-portable
 
-[![Latest release](https://img.shields.io/github/v/release/lightinmirror/manimgl-portable?label=release)](../../releases/latest) [![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D6)](../../releases/latest)
+**在 Windows 上，免安装开始制作数学动画。**
 
-manimgl 是 3Blue1Brown 用的动画引擎。在 Windows 上直接装它比较费事：要装 Python 和一堆
-科学计算库，要装 TeX 发行版才有公式，要装 FFmpeg 还要配 PATH，中文在 GBK 环境下还会碰上
-一串编码问题。
+[![Latest release](https://img.shields.io/github/v/release/lightinmirror/manimgl-portable?label=release)](https://github.com/lightinmirror/manimgl-portable/releases/latest) [![Platform](https://img.shields.io/badge/platform-Windows%20x64-0078D6)](https://github.com/lightinmirror/manimgl-portable/releases/latest)
 
-这个包把这些东西预先装好、调好，压成 233.5 MB。目标机什么都不用装，解压后双击两下就能出
-视频，并且可以离线跑。
+manimgl-portable 将 3Blue1Brown 使用的 ManimGL 动画引擎及运行依赖打包成一个 Windows
+便携环境。无需安装 Python、LaTeX 或 FFmpeg，下载后即可运行示例；用 Python 编写自己的
+场景，把公式、几何图形和函数变化导出为 MP4 视频。
 
-![demo](demo.gif)
+**Windows x64 · 中文文字与公式 · 内置 TeX 缓存，常见场景可离线渲染**
 
-## 下载
+![ManimGL 功能演示：中文文字、数学公式、图形变换、函数图像与相机运动](showcase.gif)
 
-| 文件 | 适合谁 |
-|---|---|
-| [`manimgl-portable.exe`](../../releases/latest) | 想双击就用的人。自带 Python，首次运行会自解包。 |
-| [`manimgl-selfcontained-win64.zip`](../../releases/latest/download/manimgl-selfcontained-win64.zip) | 想自己决定目录，或需要直接查看包内容的人。自带 Python。 |
-| `manimgl-env-portable.zip` | 目标机已经有 Python 3.12 的人。 |
+上面是随包提供的约 25 秒功能演示，源码见 [showcase.py](showcase.py)。完成环境自检后，
+双击 `run-showcase.cmd` 即可渲染；也可以从源码中挑一段，作为自己的第一个练习。
 
-默认下载 exe 或 `manimgl-selfcontained-win64.zip`。缓存和源码构建用的附件在 [Releases](../../releases/latest) 里。
+[**下载 exe，先体验**](https://github.com/lightinmirror/manimgl-portable/releases/latest/download/manimgl-portable.exe)
+· [**下载完整 zip，管理自己的场景目录**](https://github.com/lightinmirror/manimgl-portable/releases/latest/download/manimgl-selfcontained-win64.zip)
+· [使用限制](#使用限制与排错)
 
-## 开始运行
+## 适合用来做什么
 
-### 单文件 exe
+- **学习 ManimGL**：从可运行的示例开始，修改文字、公式和图形，逐步学习用代码编排动画。
+- **制作数学演示**：将公式推导、几何变换或函数图像做成视频，用于教学和讲解。
+- **在离线电脑上创作**：完整包自带解释器、渲染工具与 TeX 缓存，常见场景不需要联网准备资源。
 
-1. 从 [Releases](../../releases/latest) 下载 `manimgl-portable.exe`（234.2 MB）
-2. 双击
+场景使用 Python 编写。本包基于 **ManimGL 1.7.2**，属于非官方发行包；Manim Community
+Edition（ManimCE）的教程和场景可能使用不同的 API，不能直接假定兼容。
 
-首次运行会解包到 `%LOCALAPPDATA%\manimgl-portable\<版本>\` 并自检，大约一分钟；然后跑一个
-演示，成功后会打开 `videos` 文件夹，里面是 `Demo.mp4`。以后再运行只要几秒，不会重复解包。
+## 下载：主程序包选一个即可
 
-命令行参数原样转给 manimgl。要在 exe 所在目录里运行 —— PowerShell 不会执行当前目录下的
-程序，所以前面要带 `.\`：
+exe 和完整 zip 都带 Python、LaTeX 相关工具、FFmpeg 与 TeX 缓存，**正常使用无需再下载
+缓存包或构建素材**。
 
-```powershell
-.\manimgl-portable.exe my_scene.py MyScene -w -l
-```
+| 你想做什么 | 下载 | 大小 |
+|---|---|---:|
+| 先运行演示，看看效果 | [manimgl-portable.exe](https://github.com/lightinmirror/manimgl-portable/releases/latest/download/manimgl-portable.exe) | 234.2 MB |
+| 自己决定目录，查看包内容并编写场景 | [manimgl-selfcontained-win64.zip](https://github.com/lightinmirror/manimgl-portable/releases/latest/download/manimgl-selfcontained-win64.zip) | 233.5 MB |
 
-### zip
+其他附件见 [Releases](https://github.com/lightinmirror/manimgl-portable/releases/latest)：
 
-1. 下载 `manimgl-selfcontained-win64.zip`（233.5 MB）
-2. 解压（位置随意；路径过长时脚本会自己搬到短位置）
-3. 双击 `setup.cmd`，再双击 `run-demo.cmd`
+- `manimgl-env-portable.zip`（215.8 MB）：省去自带解释器，适合目标机已有 Python 3.12 的用户。
+- `tectonic-cache.zip`：主包已内置；缓存丢失时，用它恢复离线资源。
+- `tex-assets.zip`：从源码构建时使用，正常运行无需单独下载。
 
-出现 `videos\Demo.mp4`，说明整条链路（LaTeX → SVG → 渲染 → 视频）通了。`run-demo.cmd`
-自己会先跑一遍自检，`run-showcase.cmd` 不会，所以要先跑过 `setup.cmd`。
+## 第一次运行
 
-双击 `run-showcase.cmd` 可以看约 25 秒的功能巡礼：文字与标记、公式与中文、图形与变换、
-坐标轴作图、相机运动。
+### exe：下载后双击
 
-![showcase](showcase.gif)
+1. 下载 `manimgl-portable.exe`。
+2. 双击运行，等待首次解包、环境自检与演示渲染。
+3. 成功后会打开 `videos` 文件夹，查看其中的 `Demo.mp4`。
 
-**首次运行前先把解压目录加进杀毒软件白名单。** 包里的 `ffmpeg.exe`（77 MB）和
-`tectonic.exe`（49 MB）是误报高发对象，经常被直接隔离删除。出问题就双击 `check.cmd`，
-它会逐项报出哪个组件异常，把整屏截图发到 Issues 即可。
+首次解包到 `%LOCALAPPDATA%\manimgl-portable\<版本>\`，需要一些时间；后续运行会复用
+已解包的环境。双击 exe 会运行环境验证示例；想看完整功能演示，可在解包目录中双击
+`run-showcase.cmd`。
 
-目标机如果已经装了 Python 3.12，可以改用 `manimgl-env-portable.zip`（215.8 MB），省掉自带的
-那套解释器。
+### zip：解压后运行两个脚本
 
-## 自己写场景
+1. 下载并完整解压 `manimgl-selfcontained-win64.zip`。建议使用较短的目录，包根完整路径
+   不超过 94 个字符；过长时安装脚本会尝试迁移到短位置。
+2. 双击 `setup.cmd`，完成环境自检和缓存安装。
+3. 双击 `run-demo.cmd`，查看生成的 `videos\Demo.mp4`。
 
-在包目录里新建 `my.py`：
+`run-demo.cmd` 自己也会先做自检；`run-showcase.cmd` 不会，所以观看功能演示前应完成
+`setup.cmd`。
+
+### 怎样确认环境正常
+
+`Demo.mp4` 中的中文、分数线、求和与积分应显示完整。这个示例检查 LaTeX → SVG → 渲染
+→ 视频的整条链路，源码见 [demo.py](demo.py)。
+
+![环境验证示例：中文标题、分数、求和与积分](demo.gif)
+
+杀毒软件可能隔离包内的 `ffmpeg.exe` 或 `tectonic.exe`。出现组件缺失或运行失败时，先检查
+隔离记录并恢复文件，必要时将包目录加入白名单；再运行 `check.cmd`，把检查结果和错误
+截图附到 [Issues](https://github.com/lightinmirror/manimgl-portable/issues)。
+
+## 写自己的第一个场景
+
+先完成上面的演示，再用 Python 编写场景。将下面的代码保存为 UTF-8 编码的 `my.py`：
 
 ```python
 from manimlib import *
@@ -71,24 +89,43 @@ class MyScene(Scene):
         self.play(FadeIn(Text("你好")))
 ```
 
-在这个目录下运行：
+**使用 exe**：把 `my.py` 和 exe 放在同一目录，在该目录打开 PowerShell，运行：
 
 ```powershell
-manim-env\Scripts\python.exe -m manimlib my.py MyScene -w -m
+.\manimgl-portable.exe my.py MyScene -w -m
 ```
 
-结果在 `videos\MyScene.mp4`。
+**使用 zip**：把 `my.py` 放在完成自检的包目录，在该目录打开 PowerShell，运行：
 
-## 省掉了什么
+```powershell
+.\manim-env\Scripts\python.exe -m manimlib my.py MyScene -w -m
+```
 
-| 自己装 manimgl | 本包 |
+两种方式都会将结果写到当前目录的 `videos\MyScene.mp4`。exe 会把命令行参数转发给
+ManimGL；PowerShell 调用当前目录的程序时，前面需要带 `.\`。
+
+下一步可以修改 `"你好"`，或使用 `Text("你好", fill_color=YELLOW)` 改颜色；再查看
+[showcase.py](showcase.py)，学习公式、图形变换、坐标轴和相机运动的写法。
+
+## 省掉哪些配置工作
+
+在 Windows 上搭建 ManimGL，通常需要准备解释器和科学计算库、公式渲染工具、视频编码器，
+还要处理工具路径与中文编码。本包提前完成这些准备：
+
+| 环节 | 包内提供 |
 |---|---|
-| Python 加 numpy、scipy、matplotlib、moderngl 等一堆依赖 | CPython 与全部依赖已打包 |
-| TeX 发行版才有公式。本机装的 TeX Live 2024 是 8.33 GB、23.9 万个文件；MiKTeX 轻得多，但要能跑起来也在一 GB 上下 | 内置 Tectonic、dvisvgm 与最小字体树，解压后约 104 MB |
-| FFmpeg，还要配好 PATH | 内置静态 FFmpeg |
-| 中文豆腐块、GBK 编码报错 | 已处理 |
+| Python 和科学计算依赖 | CPython 3.12.10，以及 numpy、scipy、matplotlib、moderngl 等依赖 |
+| LaTeX 公式与中文公式 | Tectonic、dvisvgm、最小字体树与 TeX 资源缓存 |
+| 视频编码 | 静态 FFmpeg，按包内位置查找 |
+| 中文 Windows 编码 | 针对 GBK locale 的文本读写修复 |
 
-代价是包体 233.5 MB（压缩后）。
+完整 zip 压缩后为 233.5 MB。目标机无需另装 Python、LaTeX 或 FFmpeg；自定义场景仍由
+使用者编写。
+
+发行包已做过异机运行、离线首次公式编译、中文渲染与包体审计检查，具体方式见
+[RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md)。附件 SHA-256 见
+[Release 说明](https://github.com/lightinmirror/manimgl-portable/releases/latest)，组件来源与
+许可证见 [THIRD-PARTY.md](THIRD-PARTY.md)。
 
 ## 包里有什么
 
@@ -108,7 +145,7 @@ THIRD-PARTY.md / LICENSES\
 
 上面这份是 zip 的内容。`patches/`、`LICENSE`、构建脚本只在源码仓库里，不进发行包。
 
-## 已知问题
+## 使用限制与排错
 
 - 只在 Windows x64 上验证过。包内是 `.exe`，Linux 和 macOS 用不了。
 - 只覆盖 `Text` / `Tex` 的常用路径：单行、`\n` 多行、CJK、常见数学符号。特殊宏包组合可能
@@ -160,7 +197,7 @@ Text("hello", color=YELLOW)        # 无效
 从零构建需要网络和 [uv](https://docs.astral.sh/uv/)：
 
 ```powershell
-# TeX 素材二选一：本机装过 TeX Live，或用 Release 里的 tex-assets.zip（37 MB）
+# TeX 素材二选一：本机装过 TeX Live，或用 Release 里的 tex-assets.zip（37.6 MB）
 powershell -ExecutionPolicy Bypass -File make-release.ps1 -TexLiveDir <...\texlive\2024>
 powershell -ExecutionPolicy Bypass -File make-release.ps1 -TexAssetsZip <...\tex-assets.zip>
 ```
