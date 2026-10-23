@@ -54,7 +54,7 @@ if ($root.Length -gt $SAFE_ROOT) {
     }
     Write-Host "    迁移完成，从新位置继续 ..." -ForegroundColor Green
     Write-Host ""
-    & (Join-Path $short 'bootstrap.ps1')
+    & (Join-Path $short 'bootstrap.ps1') -RunDemo:$RunDemo
     exit $LASTEXITCODE
 }
 
@@ -233,6 +233,14 @@ Write-Host "-- 冒烟测试 --"
 & $py -c "import manimlib; print('manimlib import OK')" 2>&1 |
     Select-String -NotMatch 'pkg_resources|UserWarning|Refrain|deprecated|SyntaxWarning|re\.match|elif re'
 
+$smokeRc = $LASTEXITCODE
+if ($smokeRc -ne 0) {
+    Write-Host ""
+    Write-Host "导入 manimlib 失败（退出码 $smokeRc），环境不完整，先不要渲染。" -ForegroundColor Red
+    Write-Host "把上面窗口里的报错发回去。" -ForegroundColor Red
+    exit 1
+}
+
 if ($missing -gt 0) {
     Write-Host ""
     Write-Host "$missing 个自带文件缺失，渲染前请先补齐。" -ForegroundColor Yellow
@@ -259,6 +267,8 @@ if ($RunDemo) {
     } else {
         Write-Host "[失败] 没有生成 videos\Demo.mp4" -ForegroundColor Red
         Write-Host "       请把上面窗口里的报错信息发回去。" -ForegroundColor Red
+        Write-Host ""
+        exit 1
     }
     Write-Host ""
     exit 0
