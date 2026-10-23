@@ -43,7 +43,10 @@ if ($root.Length -gt $SAFE_ROOT) {
     Write-Host "    自动迁移到更短的位置：$short" -ForegroundColor Yellow
     # 复用前先确认目标是一份完整副本，避免复用上次残留的残缺目录
     $shortOk = (Test-Path -LiteralPath (Join-Path $short 'bootstrap.ps1')) -and
-               (Test-Path -LiteralPath (Join-Path $short 'manim-env\pyvenv.cfg'))
+               (Test-Path -LiteralPath (Join-Path $short 'manim-env\pyvenv.cfg')) -and
+               (Test-Path -LiteralPath (Join-Path $short 'manim-env\Scripts\python.exe')) -and
+               (Test-Path -LiteralPath (Join-Path $short 'manim-env\Scripts\tectonic.exe')) -and
+               (Test-Path -LiteralPath (Join-Path $short 'demo.py'))
     if (-not $shortOk) {
         Write-Host "    （首次迁移要复制约 0.5 GB，请稍候）"
         robocopy $root $short /E /NFL /NDL /NJH /NJS /NP /R:1 /W:1 | Out-Null
