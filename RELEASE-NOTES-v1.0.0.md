@@ -56,13 +56,18 @@ ManimCE 的场景不能直接假定兼容。[查看功能演示与完整使用�
 
 组件版本：ManimGL 1.7.2、Tectonic 0.17.0、dvisvgm 3.2.2、FFmpeg 6.0、CPython 3.12.10。
 
-## 校验值
+## 本次重建改了什么
 
 本次重建修正了 `bootstrap.ps1` 在路径过长自动迁移后跳过 demo 的问题（退出码也改成如实反映），
 并在迁移前多校验三个文件，避免复用上次失败留下的残缺目录。
 
+单文件 exe 的启动器也改了两处：启动时只读文件尾部的偏移量，不再每次把整个 234 MB 读进内存；
+首启解包加了互斥锁，两个实例同时双击时后来的会等前一个装完，不会互相踩。
+
+## 校验值
+
 ```text
-manimgl-portable.exe             EBFC02C58782970533D8339D652A9EC78AE8CFC453EF4C3B3430B9B26CBCDD2F
+manimgl-portable.exe             59659AC365705BB302D85B2E45A26BC9D3FD8126A08E408EAE1A8BB6D81DC0E0
 manimgl-selfcontained-win64.zip  7A684CDCBE906C4FC55A1F4B0611F4CBF3D18C2A414BEDE5736D70CED11DFFBE
 manimgl-env-portable.zip         D68E4EF33F7E234EDF78CF1780C83EB9E967349C73F3920E1CED011017117842
 tectonic-cache.zip               67FA1804C0F1DA864AD6DB5A8815283A8BFAE6AF456C5581230921BF587E28F0

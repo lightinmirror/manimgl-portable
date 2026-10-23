@@ -8,7 +8,7 @@
 
 use std::env;
 use std::fs;
-use std::io::{self, Cursor, Write};
+use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 use std::process::{exit, Command};
 
@@ -42,8 +42,8 @@ fn main() {
 
 fn run() -> Result<(), String> {
     let exe = env::current_exe().map_err(|e| format!("取自身路径失败: {e}"))?;
-    let own = fs::read(&exe).map_err(|e| format!("读取自身失败: {e}"))?;
-    let (off, len) = payload_span(&own)?;
+    // 只读尾部 16 字节的 trailer，不把整个 exe（约 234 MB）读进内存
+    let (off, len) = payload_span(&exe)?;
 
     let target = install_dir()?;
     let marker = target.join(".payload-ok");
@@ -53,26 +53,37 @@ fn run() -> Result<(), String> {
         != Some(stamp.as_str());
 
     if fresh {
-        println!("============================================");
-        println!("  manimgl-portable {VERSION}  首次运行：解包");
-        println!("============================================");
-        println!("目标目录: {}", target.display());
-        println!("（约 0.5 GB，需要一两分钟）");
-        println!();
-        let payload = own.get(off..off + len).ok_or("载荷越界（文件被截断？）")?;
-        extract(payload, &target)?;
-        fs::write(&marker, &stamp).map_err(|e| format!("写标记失败: {e}"))?;
+        // 防止两个实例同时解包到同一个目录
+        let _lock = ExtractLock::acquire(&target)?;
+        // 拿到锁之后再查一次：可能另一个实例刚把它装完了
+        let done = fs::read_to_string(&marker)
+            .map(|s| s.trim().to_string())
+            .ok()
+            .as_deref()
+            == Some(stamp.as_str());
+        if !done {
+            println!("============================================");
+            println!("  manimgl-portable {VERSION}  首次运行：解包");
+            println!("============================================");
+            println!("目标目录: {}", target.display());
+            println!("（约 0.5 GB，需要一两分钟）");
+            println!();
+            // 只有真要解包时才把载荷读进来
+            let payload = read_payload(&exe, off, len)?;
+            extract(&payload, &target)?;
+            fs::write(&marker, &stamp).map_err(|e| format!("写标记失败: {e}"))?;
 
-        let bootstrap = target.join("bootstrap.ps1");
-        println!();
-        println!("-- 环境自检 --");
-        let st = Command::new("powershell")
-            .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-File"])
-            .arg(&bootstrap)
-            .status()
-            .map_err(|e| format!("无法运行 powershell: {e}"))?;
-        if !st.success() {
-            return Err("环境自检未通过（请把上面的输出发回）".into());
+            let bootstrap = target.join("bootstrap.ps1");
+            println!();
+            println!("-- 环境自检 --");
+            let st = Command::new("powershell")
+                .args(["-NoProfile", "-ExecutionPolicy", "Bypass", "-File"])
+                .arg(&bootstrap)
+                .status()
+                .map_err(|e| format!("无法运行 powershell: {e}"))?;
+            if !st.success() {
+                return Err("环境自检未通过（请把上面的输出发回）".into());
+            }
         }
     } else {
         println!("== manimgl-portable {VERSION} ==");
@@ -124,21 +135,67 @@ fn run() -> Result<(), String> {
     Ok(())
 }
 
-/// 从文件尾部读 trailer，得到载荷的 [起点, 长度)
-fn payload_span(own: &[u8]) -> Result<(usize, usize), String> {
-    if own.len() < TRAILER {
+/// 只读文件尾部的 trailer，算出载荷的 [起点, 长度)，不加载整个文件
+fn payload_span(exe: &Path) -> Result<(u64, u64), String> {
+    let mut f = fs::File::open(exe).map_err(|e| format!("打开自身失败: {e}"))?;
+    let total = f.metadata().map_err(|e| format!("取文件大小失败: {e}"))?.len();
+    if total < TRAILER as u64 {
         return Err("文件太小，不是合法载荷".into());
     }
-    let t = &own[own.len() - TRAILER..];
+    let mut t = [0u8; TRAILER];
+    f.seek(SeekFrom::Start(total - TRAILER as u64))
+        .map_err(|e| format!("定位 trailer 失败: {e}"))?;
+    f.read_exact(&mut t).map_err(|e| format!("读 trailer 失败: {e}"))?;
     if &t[8..16] != MAGIC {
         return Err("找不到内嵌载荷（这个 exe 没被打过包？）".into());
     }
-    let off = u64::from_le_bytes(t[0..8].try_into().unwrap()) as usize;
-    if off >= own.len() - TRAILER {
+    let off = u64::from_le_bytes(t[0..8].try_into().unwrap());
+    if off >= total - TRAILER as u64 {
         return Err("载荷偏移非法".into());
     }
-    let len = own.len() - TRAILER - off;
-    Ok((off, len))
+    Ok((off, total - TRAILER as u64 - off))
+}
+
+/// 只在确认需要解包时才把载荷读进内存
+fn read_payload(exe: &Path, off: u64, len: u64) -> Result<Vec<u8>, String> {
+    let mut f = fs::File::open(exe).map_err(|e| format!("打开自身失败: {e}"))?;
+    f.seek(SeekFrom::Start(off)).map_err(|e| format!("定位载荷失败: {e}"))?;
+    let mut buf = vec![0u8; len as usize];
+    f.read_exact(&mut buf)
+        .map_err(|e| format!("读载荷失败（文件被截断？）: {e}"))?;
+    Ok(buf)
+}
+
+/// 首启解包期间的互斥锁：create_new 原子创建，进程退出时删除
+struct ExtractLock {
+    path: PathBuf,
+}
+
+impl ExtractLock {
+    fn acquire(target: &Path) -> Result<Self, String> {
+        fs::create_dir_all(target).map_err(|e| format!("建目录失败: {e}"))?;
+        let path = target.join(".extracting");
+        for _ in 0..600 {
+            match fs::OpenOptions::new().write(true).create_new(true).open(&path) {
+                Ok(mut f) => {
+                    let _ = write!(f, "{}", std::process::id());
+                    return Ok(Self { path });
+                }
+                Err(e) if e.kind() == io::ErrorKind::AlreadyExists => {
+                    println!("  另一个实例正在解包，等它完成 ...");
+                    std::thread::sleep(std::time::Duration::from_millis(500));
+                }
+                Err(e) => return Err(format!("创建锁文件失败: {e}")),
+            }
+        }
+        Err("等另一个实例解包超时（60 秒）。确认没有其它实例后，删掉目标目录下的 .extracting 再试。".into())
+    }
+}
+
+impl Drop for ExtractLock {
+    fn drop(&mut self) {
+        let _ = fs::remove_file(&self.path);
+    }
 }
 
 fn install_dir() -> Result<PathBuf, String> {
